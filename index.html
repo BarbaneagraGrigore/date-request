@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pending Request • Maria</title>
+
+  <style>
+      body {
+          margin: 0;
+          background: #0d1117;
+          color: #58a6ff;
+          font-family: "Courier New", monospace;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+      }
+
+      .terminal {
+          width: 90%;
+          max-width: 700px;
+          background: #161b22;
+          border: 1px solid #30363d;
+          border-radius: 12px;
+          padding: 24px;
+          box-shadow: 0 0 25px rgba(88, 166, 255, 0.15);
+      }
+
+      .header {
+          color: #8b949e;
+          margin-bottom: 20px;
+      }
+
+      .line {
+          margin: 10px 0;
+          white-space: pre-wrap;
+      }
+
+      .json {
+          color: #79c0ff;
+      }
+
+      .buttons {
+          margin-top: 30px;
+          display: flex;
+          gap: 12px;
+          position: relative;
+      }
+
+      button {
+          background: #21262d;
+          border: 1px solid #30363d;
+          color: white;
+          padding: 12px 18px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: 0.2s;
+          font-family: inherit;
+          font-size: 14px;
+          position: relative;
+      }
+
+      button:hover {
+          background: #30363d;
+          transform: translateY(-2px);
+      }
+
+      .response {
+          margin-top: 24px;
+          color: #3fb950;
+          min-height: 30px;
+      }
+
+      .typing::after {
+          content: "_";
+          animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+          50% {
+              opacity: 0;
+          }
+      }
+  </style>
+</head>
+
+<body>
+
+<div class="terminal">
+
+  <div class="header">
+    grigore@dating-api:~$
+  </div>
+
+  <div class="line typing" id="loading">
+    Initializing request...
+  </div>
+
+  <div id="content" style="display:none;">
+
+    <div class="line" id="requestLine"></div>
+
+    <div class="line json" id="jsonBlock"></div>
+
+    <div class="line">
+      Awaiting response...
+    </div>
+
+    <div class="buttons">
+      <button onclick="successReply()">
+        200 OK
+      </button>
+
+      <button id="escapeButton" onmouseover="moveButton()" onclick="moveButton()">
+        302 Redirect
+      </button>
+
+      <button onclick="reply('500 Error — Too nervous but secretly interested 🙈')">
+        500 Error
+      </button>
+    </div>
+
+    <div class="response" id="response"></div>
+
+  </div>
+
+</div>
+
+<script>
+  const requestText = "POST /date-request HTTP/1.1";
+
+  const jsonText = `{
+  "candidate": "you",
+  "activity": "coffee or dinner",
+  "time": "this week",
+  "reason": "I want to know you better"
+}`;
+
+  function typeText(elementId, text, speed = 35) {
+    const element = document.getElementById(elementId);
+    let i = 0;
+
+    const interval = setInterval(() => {
+      element.innerText += text.charAt(i);
+      i++;
+
+      if (i >= text.length) {
+        clearInterval(interval);
+      }
+    }, speed);
+  }
+
+  setTimeout(() => {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("content").style.display = "block";
+
+    typeText("requestLine", requestText, 30);
+
+    setTimeout(() => {
+      typeText("jsonBlock", jsonText, 15);
+    }, 1000);
+
+  }, 1800);
+
+  function reply(message) {
+    document.getElementById("response").innerText = message;
+  }
+
+  function successReply() {
+    const response = document.getElementById("response");
+
+    response.innerHTML = `
+      <div style="margin-top:10px;">
+        200 OK — Request accepted successfully ❤️
+      </div>
+
+      <div style="margin-top:20px; color:#58a6ff;">
+        POST /choose-date-plan HTTP/1.1
+      </div>
+
+      <div style="margin-top:10px;">
+        {
+          "question": "What should we get?"
+        }
+      </div>
+
+      <div style="margin-top:20px; display:flex; gap:12px;">
+        <button onclick="finalChoice('☕ Coffee date deployed successfully')">
+          ☕ Coffee
+        </button>
+
+        <button onclick="finalChoice('🍕 Pizza date deployed successfully')">
+          🍕 Pizza
+        </button>
+      </div>
+    `;
+  }
+
+  function finalChoice(message) {
+    document.getElementById("response").innerHTML = `
+      <div style="margin-top:10px; color:#3fb950;">
+        ${message}
+      </div>
+    `;
+  }
+
+  function moveButton() {
+    const button = document.getElementById("escapeButton");
+
+    const maxX = 250;
+    const maxY = 120;
+
+    const randomX = Math.floor(Math.random() * maxX) - 125;
+    const randomY = Math.floor(Math.random() * maxY) - 60;
+
+    button.style.transform = `translate(${randomX}px, ${randomY}px)`;
+  }
+</script>
+
+</body>
+</html>
